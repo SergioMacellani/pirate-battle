@@ -47,6 +47,7 @@ export class GameRenderer {
   private lastSnapshot?: GameSnapshot;
   private soundManager?: SoundManager;
   private testBridge?: Window["__PIRATE_BATTLE_TEST__"];
+  private resizeObserver?: ResizeObserver;
 
   public setTelemetryListener(listener: (snapshot: GameSnapshot, fps: number, samples: number[], result?: MatchResult) => void): void {
     this.telemetryListener = listener;
@@ -154,11 +155,44 @@ export class GameRenderer {
     this.app.renderer.resize(width, height);
     this.app.renderer.render(this.app.stage);
 
+    this.resizeObserver = new ResizeObserver((entries) => {
+      const size = entries[0]?.contentRect;
+      if (!size) return;
+      this.resize(size.width, size.height);
+    });
+    this.resizeObserver.observe(container);
+
     window.addEventListener("keydown", this.onKeyDown);
     window.addEventListener("keyup", this.onKeyUp);
 
     this.lastTime = performance.now();
     this.rafId = requestAnimationFrame(this.rafLoop);
+  }
+
+  private resize(width: number, height: number): void {
+    if (!this.app || !this.map || !this.player || width <= 0 || height <= 0) {
+      return;
+    }
+
+    const currentWidth = this.app.renderer.width / this.app.renderer.resolution;
+    const currentHeight = this.app.renderer.height / this.app.renderer.resolution;
+    if (currentWidth === width && currentHeight === height) {
+      return;
+    }
+
+    this.app.renderer.resize(width, height);
+    this.map.resize(width, height);
+    this.simulation.setCollisionRects(this.map.getCollisionRects());
+    this.simulation.setStructureCollisionRects(this.map.getStructureCollisionRects());
+    this.simulation.resizeArena(width, height);
+    const snapshot = this.simulation.getSnapshot();
+    this.player.update(
+      snapshot.playerPosition,
+      snapshot.playerRotation,
+      snapshot.playerHealth,
+      snapshot.config.player.maxHealth,
+    );
+    this.app.renderer.render(this.app.stage);
   }
 
   private onKeyDown(e: KeyboardEvent): void {
@@ -390,6 +424,8 @@ export class GameRenderer {
 
   destroy(): void {
     this.destroyed = true;
+    this.resizeObserver?.disconnect();
+    this.resizeObserver = undefined;
     if (this.rafId) cancelAnimationFrame(this.rafId);
     this.rafId = undefined;
     this.keys = {};

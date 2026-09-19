@@ -15,6 +15,7 @@ import { SoundManager } from "./game/audio/SoundManager";
 type Screen =
   | "menu"
   | "options"
+  | "tutorial"
   | "ranking"
   | "history"
   | "game"
@@ -23,8 +24,11 @@ type Screen =
   | "result";
 
 function createMatchSeed(): number {
-  const testSeed = Number(new URLSearchParams(window.location.search).get("seed"));
-  if (Number.isFinite(testSeed)) return testSeed;
+  const seedParam = new URLSearchParams(window.location.search).get("seed");
+  if (seedParam !== null && seedParam.trim() !== "") {
+    const testSeed = Number(seedParam);
+    if (Number.isFinite(testSeed)) return testSeed;
+  }
   return Math.floor(Math.random() * 1_000_000_000);
 }
 
@@ -183,6 +187,7 @@ function App() {
             }}
           />
         )}
+        {screen === "tutorial" && <TutorialScreen onBack={() => setScreen("menu")} />}
         {screen === "ranking" && (
           <RankingScreen
             config={config}
@@ -306,6 +311,7 @@ function MenuScreen({ onPlay, onNavigate, networkScenario, onNetworkScenarioChan
       <div style={styles.navRow}>
         <button style={styles.ghostButton} onClick={() => onNavigate("ranking")}>RANKING</button>
         <button style={styles.ghostButton} onClick={() => onNavigate("history")}>MATCH HISTORY</button>
+        <button style={styles.ghostButton} onClick={() => onNavigate("tutorial")}>TUTORIAL</button>
       </div>
       <div style={styles.networkControls} aria-label="Network mock controls">
         <label style={styles.networkLabel} htmlFor="network-scenario">NETWORK SCENARIO</label>
@@ -409,6 +415,36 @@ function OptionsScreen({ config, onChange, onBack }: OptionsScreenProps) {
           </button>
         </div>
       </form>
+    </section>
+  );
+}
+
+function TutorialScreen({ onBack }: { onBack: () => void }) {
+  return (
+    <section style={styles.panel} aria-labelledby="tutorial-title">
+      <Header title="Tutorial" subtitle="Command your ship" />
+      <div style={styles.tutorialGrid}>
+        <div style={styles.tutorialGroup}>
+          <h2 style={styles.tutorialHeading}>Keyboard</h2>
+          <p style={styles.tutorialLine}><strong>W / Up</strong><span>Move forward</span></p>
+          <p style={styles.tutorialLine}><strong>S / Down</strong><span>Move backward</span></p>
+          <p style={styles.tutorialLine}><strong>A / Left</strong><span>Turn left</span></p>
+          <p style={styles.tutorialLine}><strong>D / Right</strong><span>Turn right</span></p>
+          <p style={styles.tutorialLine}><strong>Space</strong><span>Fire forward</span></p>
+          <p style={styles.tutorialLine}><strong>Q / A</strong><span>Fire left broadside</span></p>
+          <p style={styles.tutorialLine}><strong>E / D</strong><span>Fire right broadside</span></p>
+        </div>
+        <div style={styles.tutorialGroup}>
+          <h2 style={styles.tutorialHeading}>Touch</h2>
+          <p style={styles.tutorialLine}><strong>Arrow buttons</strong><span>Move and turn</span></p>
+          <p style={styles.tutorialLine}><strong>Center cannon</strong><span>Fire forward</span></p>
+          <p style={styles.tutorialLine}><strong>Side cannons</strong><span>Fire left or right</span></p>
+          <p style={styles.tutorialNote}>Combine movement and firing to keep your ship moving while attacking.</p>
+        </div>
+      </div>
+      <div style={styles.buttonRow}>
+        <button style={styles.primaryButton} type="button" onClick={onBack}>MAIN MENU</button>
+      </div>
     </section>
   );
 }
@@ -787,7 +823,8 @@ const styles = {
     zIndex: 2,
     display: "grid",
     placeItems: "center",
-    padding: 24,
+    padding: "clamp(8px, 3vh, 24px)",
+    overflowY: "auto" as const,
     background: "rgba(5, 25, 35, 0.22)",
   },
   gameOverlay: {
@@ -798,9 +835,11 @@ const styles = {
   },
   menuPanel: {
     width: "min(100%, 700px)",
-    height: "min(560px, calc(100vh - 32px))",
+    height: "auto",
+    maxHeight: "calc(100vh - 16px)",
+    overflowY: "auto" as const,
     boxSizing: "border-box" as const,
-    padding: "clamp(30px, 6vw, 58px) clamp(28px, 7vw, 72px) 28px",
+    padding: "clamp(18px, 5vh, 58px) clamp(20px, 7vw, 72px) clamp(18px, 3vh, 28px)",
     background: "url('/assets/png/default/ui/menu/panel_menu.png') center / 100% 100% no-repeat",
     filter: "drop-shadow(0 28px 36px rgba(0, 0, 0, 0.34))",
     display: "grid",
@@ -811,9 +850,11 @@ const styles = {
   },
   panel: {
     width: "min(100%, 700px)",
-    height: "min(560px, calc(100vh - 32px))",
+    height: "auto",
+    maxHeight: "calc(100vh - 16px)",
+    overflowY: "auto" as const,
     boxSizing: "border-box" as const,
-    padding: "42px 54px 44px",
+    padding: "clamp(20px, 5vh, 42px) clamp(22px, 6vw, 54px) clamp(20px, 5vh, 44px)",
     background: "url('/assets/png/default/ui/menu/panel_menu.png') center / 100% 100% no-repeat",
     filter: "drop-shadow(0 28px 36px rgba(0, 0, 0, 0.34))",
     color: "#f7ebc5",
@@ -825,15 +866,16 @@ const styles = {
     transform: "translate(-50%, -50%)",
     width: "min(calc(100% - 48px), 700px)",
     boxSizing: "border-box" as const,
-    height: "min(560px, calc(100vh - 32px))",
-    padding: "48px 66px 42px",
+    maxHeight: "calc(100vh - 16px)",
+    overflowY: "auto" as const,
+    padding: "clamp(22px, 5vh, 48px) clamp(24px, 7vw, 66px) clamp(22px, 4vh, 42px)",
     pointerEvents: "auto" as const,
     background: "url('/assets/png/default/ui/menu/panel_menu.png') center / 100% 100% no-repeat",
     filter: "drop-shadow(0 28px 36px rgba(0, 0, 0, 0.34))",
     color: "#f7ebc5",
     textAlign: "center" as const,
   },
-  headerBlock: { display: "grid", gap: 8, justifyItems: "center", marginBottom: 12 },
+  headerBlock: { display: "grid", gap: "clamp(4px, 1vh, 8px)", justifyItems: "center", marginBottom: "clamp(6px, 2vh, 12px)" },
   eyebrow: {
     margin: "0 0 8px",
     color: "#f4c95d",
@@ -850,7 +892,7 @@ const styles = {
   heroTitle: { margin: "0 0 12px", fontSize: "clamp(34px, 6vw, 62px)", lineHeight: 1 },
   title: { margin: 0, fontSize: "clamp(28px, 4vw, 52px)", color: "#f7d58d", letterSpacing: "0.08em", textTransform: "uppercase" as const, textShadow: "0 3px 0 rgba(58, 26, 0, 0.8)" },
   subtitle: { color: "#f4dca4", margin: 0, textAlign: "center" as const, fontSize: 14, letterSpacing: "0.12em", textTransform: "uppercase" as const },
-  primaryActions: { display: "grid", gap: 14, margin: "8px auto 6px", width: "100%", maxWidth: 320, justifySelf: "center" },
+  primaryActions: { display: "grid", gap: "clamp(6px, 1.5vh, 14px)", margin: "clamp(4px, 1vh, 8px) auto 6px", width: "100%", maxWidth: 320, justifySelf: "center" },
   secondaryButton: {
     background: "url('/assets/png/default/ui/menu/button_primary_normal.png') center / 100% 100% no-repeat",
     color: "#2a1b09",
@@ -858,7 +900,7 @@ const styles = {
     borderRadius: 0,
     boxShadow: "none",
     fontWeight: 700,
-    minHeight: 70,
+    minHeight: "clamp(48px, 8vh, 70px)",
     fontSize: 18,
     letterSpacing: "0.08em",
     textTransform: "uppercase" as const,
@@ -873,7 +915,7 @@ const styles = {
     borderRadius: 0,
     boxShadow: "none",
     fontWeight: 700,
-    minHeight: 70,
+    minHeight: "clamp(48px, 8vh, 70px)",
     fontSize: 18,
     letterSpacing: "0.08em",
     textTransform: "uppercase" as const,
@@ -888,7 +930,7 @@ const styles = {
     borderRadius: 0,
     boxShadow: "none",
     fontWeight: 700,
-    minHeight: 58,
+    minHeight: "clamp(44px, 7vh, 58px)",
     padding: "0 24px",
     fontSize: 12,
     letterSpacing: "0.08em",
@@ -902,9 +944,9 @@ const styles = {
   networkReset: { minHeight: 34, border: "1px solid #d58a2d", background: "rgba(213, 138, 45, 0.2)", color: "#f7d58d", fontSize: 11, fontWeight: 700, cursor: "pointer" },
   controls: { display: "grid", gap: 8, marginTop: 0, color: "#f6e3b3", fontSize: 13, textAlign: "center" as const },
   controlsBadge: { fontSize: 22, lineHeight: 1 },
-  form: { display: "grid", gap: 18, marginTop: 8 },
+  form: { display: "grid", gap: "clamp(6px, 2vh, 18px)", marginTop: "clamp(4px, 1vh, 8px)" },
   label: { display: "grid", gap: 8, color: "#f7ebc5" },
-  optionRow: { display: "grid", gap: 10, justifyItems: "center", padding: "12px 0" },
+  optionRow: { display: "grid", gap: "clamp(4px, 1vh, 10px)", justifyItems: "center", padding: "clamp(4px, 1.5vh, 12px) 0" },
   optionLabel: { color: "#f2d89c", fontSize: 15, letterSpacing: "0.06em", textTransform: "uppercase" as const },
   toggleRow: { display: "flex", alignItems: "center", justifyContent: "center", gap: 10, padding: "5px 0", cursor: "pointer" },
   sliderRow: { display: "grid", gap: 8, justifyItems: "center", padding: "6px 0" },
@@ -914,7 +956,13 @@ const styles = {
   counterValue: { minWidth: 112, textAlign: "center" as const, color: "#f9e7b3", fontWeight: 700, fontSize: 20 },
   counterButton: { width: 34, height: 34, borderRadius: "50%", border: "3px solid #b7721d", background: "linear-gradient(180deg, #f7d683, #d58a2d)", color: "#2d1d0d", fontWeight: 700, fontSize: 20, cursor: "pointer" },
   input: { padding: "12px 14px", font: "inherit", color: "#17252b", background: "#f5f7fa", border: 0 },
-  buttonRow: { display: "flex", width: "100%", justifyContent: "center", gap: 12, marginTop: 14, flexWrap: "wrap" as const },
+  buttonRow: { display: "flex", width: "100%", justifyContent: "center", gap: "clamp(6px, 1.5vh, 12px)", marginTop: "clamp(6px, 2vh, 14px)", flexWrap: "wrap" as const },
+  tutorialGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "clamp(12px, 3vh, 24px)", marginTop: "clamp(4px, 1vh, 10px)" },
+  tutorialGroup: { display: "grid", gap: "clamp(4px, 1vh, 8px)" },
+  tutorialHeading: { margin: 0, color: "#f4c95d", fontSize: "clamp(15px, 2vh, 20px)", textTransform: "uppercase" as const, letterSpacing: "0.08em" },
+  tutorialLine: { display: "flex", justifyContent: "space-between", gap: 12, margin: 0, padding: "clamp(4px, 1vh, 8px) 0", borderBottom: "1px solid rgba(242, 216, 156, 0.2)", color: "#f2d89c", fontSize: "clamp(12px, 1.7vh, 15px)" },
+  tutorialLineStrong: { color: "#f9e7b3" },
+  tutorialNote: { margin: "clamp(6px, 2vh, 14px) 0 0", color: "#f2d89c", fontSize: "clamp(12px, 1.7vh, 15px)", lineHeight: 1.4 },
   tabRow: { display: "flex", justifyContent: "center", gap: 14, margin: "14px 0 10px" },
   tabButton: { background: "url('/assets/png/default/ui/menu/button_secondary_normal.png') center / 100% 100% no-repeat", border: 0, borderRadius: 0, color: "#f5d688", minHeight: 58, minWidth: 180, padding: "0 20px", textTransform: "uppercase" as const, fontWeight: 700 },
   tabButtonActive: { background: "url('/assets/png/default/ui/menu/button_primary_normal.png') center / 100% 100% no-repeat", border: 0, borderRadius: 0, color: "#2b1d0d", minHeight: 58, minWidth: 180, padding: "0 20px", textTransform: "uppercase" as const, fontWeight: 700 },

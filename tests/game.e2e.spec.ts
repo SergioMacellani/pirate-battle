@@ -56,6 +56,16 @@ test.describe("Pirate Battle E2E", () => {
     await expect(page.getByText("4 s")).toBeVisible();
   });
 
+  test("opens the controls tutorial", async ({ page }) => {
+    await reset(page);
+    await page.getByRole("button", { name: "TUTORIAL", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "Tutorial" })).toBeVisible();
+    await expect(page.getByText("Fire left broadside")).toBeVisible();
+    await expect(page.getByText("Fire right broadside")).toBeVisible();
+    await page.getByRole("button", { name: "MAIN MENU", exact: true }).click();
+    await expect(page.getByRole("button", { name: "PLAY", exact: true })).toBeVisible();
+  });
+
   test("recovers from an asset request failure on a new attempt", async ({ page }) => {
     await page.route("**/assets/png/default/tiles/**", (route) => route.abort());
     await reset(page);
@@ -84,6 +94,16 @@ test.describe("Pirate Battle E2E", () => {
     expect(bounded.playerPosition.x).toBeLessThanOrEqual(900);
     expect(bounded.playerPosition.y).toBeGreaterThanOrEqual(0);
     expect(bounded.playerPosition.y).toBeLessThanOrEqual(650);
+  });
+
+  test("resizes the arena canvas with the viewport", async ({ page }) => {
+    await reset(page);
+    await startGame(page);
+    await page.setViewportSize({ width: 1100, height: 720 });
+    await expect.poll(() => page.locator("canvas").first().evaluate((canvas) => ({
+      width: canvas.clientWidth,
+      height: canvas.clientHeight,
+    }))).toEqual({ width: 1100, height: 720 });
   });
 
   test("fires frontal and broadside weapons with cooldown and no duplicate score", async ({ page }) => {

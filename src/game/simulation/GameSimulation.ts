@@ -142,6 +142,15 @@ export class GameSimulation {
     this.navigationGrid = bakeNavigationGrid(this.collisionRects, this.arenaSize, 23);
   }
 
+  public resizeArena(width: number, height: number): void {
+    this.arenaSize = { width, height };
+    this.playerPosition = {
+      x: Math.max(this.playerRadius, Math.min(width - this.playerRadius, this.playerPosition.x)),
+      y: Math.max(this.playerRadius, Math.min(height - this.playerRadius, this.playerPosition.y)),
+    };
+    this.navigationGrid = bakeNavigationGrid(this.collisionRects, this.arenaSize, 23);
+  }
+
   public setCollisionRects(rects: CollisionRect[]): void {
     this.collisionRects = rects.map((rect) => ({ ...rect }));
     this.navigationGrid = bakeNavigationGrid(this.collisionRects, this.arenaSize, 23);
@@ -365,8 +374,8 @@ export class GameSimulation {
   private spawnPlayerBroadside(side: -1 | 1): void {
     const weapon = this.config.weapons.broadside;
     const forward = this.getPlayerForwardVector();
-    const left = { x: -forward.y, y: forward.x };
-    const right = { x: forward.y, y: -forward.x };
+    const left = { x: forward.y, y: -forward.x };
+    const right = { x: -forward.y, y: forward.x };
     const sideVector = side === -1 ? left : right;
     const center = (weapon.projectileCount - 1) / 2;
     const sideOrigin = {
