@@ -2,6 +2,8 @@
 
 Shooter naval 2D para navegador, construido com React, TypeScript e PixiJS. O combate roda localmente; ranking e historico usam uma API REST simulada por MSW, consumida por Axios e TanStack Query. O checkout nao depende de servicos privados.
 
+Site em producao: https://pirate-battle-eight.vercel.app/
+
 ## Requisitos e setup
 
 - Node.js 20 ou mais recente
