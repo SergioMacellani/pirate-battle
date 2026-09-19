@@ -1,0 +1,14 @@
+[
+  {
+    "config": {
+      "sessionDurationSeconds": 120
+    },
+    "endReason": "time",
+    "playedSeconds": 45,
+    "score": 99,
+    "matchId": "api-check-001",
+    "completedAt": "2026-09-19T12:00:00.000Z",
+    "playerId": "player-check",
+    "playerName": "Captain Nova"
+  }
+]

@@ -1,0 +1,78 @@
+{
+  "tileSize": 64,
+  "tiles": {
+    "water": 73,
+    "shoreline": {
+      "top": 2,
+      "right": 19,
+      "bottom": 34,
+      "left": 17,
+      "topLeft": 1,
+      "topRight": 3,
+      "bottomLeft": 33,
+      "bottomRight": 35
+    },
+    "island": {
+      "interior": [23],
+      "random": [23,24,39,40],
+      "sand": [4,5,18,20,21,68,69],
+      "isolated": {
+        "horizontal": 97,
+        "top": 98,
+        "vertical": 99,
+        "bottom": 100,
+        "right": 101,
+        "left": 102
+      },
+      "thinCorridorCorner": {
+        "topLeft": 103,
+        "topRight": 106,
+        "bottomLeft": 104,
+        "bottomRight": 105
+      },
+      "grassTransition": {
+        "top": [7,8],
+        "right": [25,41],
+        "bottom": [55,56,82,84,86],
+        "left": [22,38],
+        "topLeft": [6],
+        "topRight": [9],
+        "bottomLeft": [54],
+        "bottomRight": [57]
+      },
+      "innerCornerTransition": {
+        "topLeft": [53],
+        "topRight": [52],
+        "bottomLeft": [37],
+        "bottomRight": [36]
+      },
+      "structures": [
+        { "center": 13, "detail": 14, "vertical": 15, "horizontal": 16, "endTop": 13, "endBottom": 13, "endLeft": 13, "endRight": 13 },
+        { "center": 29, "detail": 30, "vertical": 31, "horizontal": 32, "endTop": 29, "endBottom": 29, "endLeft": 29, "endRight": 29 },
+        { "center": 45, "detail": 46, "vertical": 47, "horizontal": 48, "endTop": 45, "endBottom": 45, "endLeft": 45, "endRight": 45 },
+        { "center": 60, "detail": 61, "vertical": 62, "horizontal": 63, "endTop": 60, "endBottom": 60, "endLeft": 60, "endRight": 60 },
+        { "center": 76, "detail": 77, "vertical": 78, "horizontal": 79, "endTop": 76, "endBottom": 76, "endLeft": 76, "endRight": 76 },
+        { "center": 92, "detail": 93, "vertical": 94, "horizontal": 95, "endTop": 92, "endBottom": 92, "endLeft": 92, "endRight": 92 }
+      ]
+    }
+  },
+  "islandSlots": [
+    { "x": 0.18, "y": 0.22 },
+    { "x": 0.8, "y": 0.18 },
+    { "x": 0.15, "y": 0.78 },
+    { "x": 0.85, "y": 0.75 },
+    { "x": 0.5, "y": 0.5 },
+    { "x": 0.5, "y": 0.86 }
+  ],
+  "islandShapes": ["organic", "chunky", "ellipse", "crescent", "diamond", "cross"],
+  "islandSize": {
+    "minWidth": 5,
+    "maxWidth": 10,
+    "minHeight": 5,
+    "maxHeight": 8
+  },
+  "islandCount": {
+    "min": 2,
+    "max": 5
+  }
+}

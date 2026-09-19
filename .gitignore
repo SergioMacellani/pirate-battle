@@ -1,0 +1,22 @@
+# macOS
+.DS_Store
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+*.tsbuildinfo
+
+# Local test output and debugging captures
+playwright-report/
+test-results/
+/*.png
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
